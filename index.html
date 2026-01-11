@@ -29,8 +29,8 @@
             /* Letterbox background */
             color: white;
             min-height: 100vh;
-            overflow: hidden;
-            /* Prevent scrollbars from full viewport */
+            /* Allow vertical scroll on mobile */
+            overflow-x: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -46,6 +46,22 @@
             padding: 15px;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
             border: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            #game-container {
+                flex-direction: column;
+                aspect-ratio: auto;
+                width: 100vw;
+                height: auto;
+                min-height: 100vh;
+                padding: 10px;
+            }
+
+            body {
+                overflow-y: auto;
+            }
         }
 
         #side-panel {
@@ -59,6 +75,20 @@
             flex-direction: column;
             margin-right: 15px;
             padding: 12px;
+        }
+
+        @media (max-width: 768px) {
+            #side-panel {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+                order: 2;
+                /* Move log to bottom on mobile if preferred */
+            }
+
+            .log-container {
+                max-height: 120px;
+            }
         }
 
         .info-bar {
@@ -124,6 +154,62 @@
             padding: 10px;
             align-items: center;
             justify-items: center;
+        }
+
+        @media (max-width: 768px) {
+            #game-board {
+                grid-template-areas:
+                    "round-info      round-info      round-info"
+                    "score-cpu2      north-hand      score-cpu2"
+                    "north-discard   north-discard   north-discard"
+                    "west-hand       center          east-hand"
+                    "west-discard    center          east-discard"
+                    "score-cpu1      center          score-cpu3"
+                    "south-discard   south-discard   south-discard"
+                    "score-player    south-hand      score-player";
+                grid-template-columns: auto 1fr auto;
+                grid-template-rows: repeat(8, auto);
+                gap: 8px;
+                padding: 5px;
+                overflow: hidden;
+            }
+
+            .card {
+                width: 50px;
+                height: 70px;
+                font-size: 2rem;
+            }
+
+            .card.mini {
+                width: 35px;
+                height: 50px;
+                font-size: 0.8rem;
+            }
+
+            .card.rotated,
+            .card.rotated-east {
+                width: 35px;
+                height: 50px;
+                font-size: 0.8rem;
+            }
+
+            .discard-area {
+                min-width: 100px;
+                max-width: 100%;
+                min-height: 40px;
+            }
+
+            .discard-card {
+                width: 28px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            #player-hand.hand-area {
+                min-width: auto;
+                width: 100%;
+                flex-wrap: wrap;
+            }
         }
 
         #round-info {
@@ -426,13 +512,45 @@
 
         #close-reveal {
             margin-top: 30px;
-            padding: 10px 40px;
+            padding: 15px 50px;
             background: var(--gold);
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            #reveal-overlay {
+                width: 90vw;
+                padding: 20px;
+            }
+
+            .reveal-title {
+                font-size: 1.4rem;
+            }
+
+            .ron-dialog {
+                width: 90vw;
+                min-width: auto;
+                padding: 15px;
+            }
+
+            .ron-message {
+                font-size: 1.2rem;
+            }
+
+            #btn-ron,
+            #btn-pass {
+                padding: 15px 25px;
+                font-size: 1rem;
+            }
+
+            #start-btn {
+                padding: 15px;
+                font-size: 1.2rem;
+            }
         }
 
         @keyframes fadeIn {
@@ -542,6 +660,122 @@
             margin: 0 10px 0 0;
         }
 
+        @media (max-width: 768px) {
+
+            #score-cpu2,
+            #score-player,
+            #score-cpu1,
+            #score-cpu3 {
+                position: static;
+                transform: none;
+                margin: 0;
+                justify-self: center;
+                min-width: 60px;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Standard Overlay/Modal CSS */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(10, 30, 20, 0.95);
+            border: 2px solid var(--gold);
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: white;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 10px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2rem;
+            color: var(--gold);
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        /* Ranking Table Styles */
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .ranking-table th,
+        .ranking-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .ranking-table th {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        /* Name Entry Styles */
+        #name-entry-container {
+            text-align: center;
+        }
+
+        #name-input {
+            background: #000;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            font-size: 2rem;
+            width: 120px;
+            text-align: center;
+            padding: 10px;
+            margin: 20px 0;
+            text-transform: uppercase;
+            font-family: monospace;
+        }
+
+        /* Rule Display Styles */
+        .rules-content h3 {
+            color: var(--gold);
+            margin: 15px 0 5px 0;
+        }
+
+        .rules-content p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .rules-content ul {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
         #score-player {
             grid-area: score-player;
             align-self: center;
@@ -641,6 +875,12 @@
                 <div id="status-message">九九合わせへようこそ</div>
                 <button id="start-btn">ゲーム開始</button>
             </header>
+            <div id="action-btns" style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <button id="rules-btn"
+                    style="flex: 1; padding: 8px; background: rgba(255,255,255,0.1); color: var(--gold); border: 1px solid var(--gold); border-radius: 4px; cursor: pointer; font-size: 0.8rem;">遊び方</button>
+                <button id="ranking-btn"
+                    style="flex: 1; padding: 8px; background: rgba(255,255,255,0.1); color: var(--gold); border: 1px solid var(--gold); border-radius: 4px; cursor: pointer; font-size: 0.8rem;">ランキング</button>
+            </div>
             <div id="settings-area"
                 style="padding: 10px; color: var(--gold); border-bottom: 1px solid rgba(255,255,255,0.1);">
                 <div style="margin-bottom: 5px;">
@@ -710,8 +950,78 @@
                 </div>
             </div>
         </div>
+
+        <!-- Rule Modal -->
+        <div id="modal-rules" class="modal-overlay">
+            <div class="modal-content">
+                <span class="close-modal"
+                    onclick="document.getElementById('modal-rules').style.display='none'">&times;</span>
+                <h2 class="modal-title">遊び方</h2>
+                <div class="rules-content">
+                    <h3>ゲームの概要</h3>
+                    <p>手札の5枚で「九九の段」を完成させるゲームです。麻雀に似たルールで、ツモやロンでアガリを目指します。</p>
+                    <h3>アガリの条件</h3>
+                    <p>5枚のカードすべてが、同じ「のだん（九九の段）」に含まれている必要があります。<br>
+                        例： <b>4, 8, 12, 20, 36</b> はすべて「4の段」なのでアガリです。</p>
+                    <h3>操作方法</h3>
+                    <ul>
+                        <li><b>自分の番：</b> 山札から1枚引き、不要なカードを1枚捨てます。</li>
+                        <li><b>ポン（ロン）：</b> 他のプレイヤーが捨てたカードが、自分のアガリに必要な最後の1枚であれば「ロン」できます。</li>
+                    </ul>
+                    <h3>勝利と得点</h3>
+                    <p>誰かがアガるか、山札がなくなると1回戦終了です。全5回戦の合計スコアで順位を競います。<br>
+                        アガリ得点は、手札の数字の合計値となります。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ranking Modal -->
+        <div id="modal-ranking" class="modal-overlay">
+            <div class="modal-content">
+                <span class="close-modal"
+                    onclick="document.getElementById('modal-ranking').style.display='none'">&times;</span>
+                <h2 class="modal-title" id="ranking-title">ランキング</h2>
+                <div id="ranking-display-area">
+                    <!-- ランキングテーブルがここに挿入される -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Name Entry Modal -->
+        <div id="modal-name-entry" class="modal-overlay">
+            <div class="modal-content" style="text-align: center;">
+                <h2 class="modal-title">ランクイン！</h2>
+                <p>1位おめでとうございます！名前を入力してください。</p>
+                <div id="name-entry-container">
+                    <input type="text" id="name-input" maxlength="2" placeholder="AA" autofocus>
+                    <br>
+                    <button id="save-name-btn"
+                        style="padding: 10px 30px; background: var(--gold); border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">登録</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
+        class RankingManager {
+            constructor() {
+                this.storageKey = 'kuku_ranking';
+            }
+            getRanking(players, level) {
+                const rankings = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+                const key = `p${players}_l${level}`;
+                return rankings[key] || [];
+            }
+            saveScore(players, level, name, score) {
+                const rankings = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
+                const key = `p${players}_l${level}`;
+                const list = rankings[key] || [];
+                list.push({ name: name.toUpperCase(), score: score, date: new Date().toLocaleDateString() });
+                list.sort((a, b) => b.score - a.score);
+                rankings[key] = list.slice(0, 10); // Top 10
+                localStorage.setItem(this.storageKey, JSON.stringify(rankings));
+            }
+        }
+
         class Card {
             constructor(number) { this.number = number; this.dans = this.calcDans(number); }
             calcDans(n) {
@@ -825,8 +1135,69 @@
                     'cpu2': document.getElementById('score-cpu2'),
                     'cpu3': document.getElementById('score-cpu3')
                 };
+
+                // New UI elements
+                this.rulesBtn = document.getElementById('rules-btn');
+                this.rankingBtn = document.getElementById('ranking-btn');
+                this.modalRules = document.getElementById('modal-rules');
+                this.modalRanking = document.getElementById('modal-ranking');
+                this.modalNameEntry = document.getElementById('modal-name-entry');
+                this.saveNameBtn = document.getElementById('save-name-btn');
+                this.nameInput = document.getElementById('name-input');
+                this.rankingDisplayArea = document.getElementById('ranking-display-area');
+                this.rankingTitle = document.getElementById('ranking-title');
+
+                this.rankingManager = new RankingManager();
             }
-            attachEvents() { this.startBtn.addEventListener('click', () => this.handleStartButton()); this.closeRevealBtn.addEventListener('click', () => this.revealOverlay.style.display = 'none'); }
+            attachEvents() {
+                this.startBtn.addEventListener('click', () => this.handleStartButton());
+                this.closeRevealBtn.addEventListener('click', () => this.revealOverlay.style.display = 'none');
+
+                this.rulesBtn.addEventListener('click', () => this.modalRules.style.display = 'flex');
+                this.rankingBtn.addEventListener('click', () => this.showRankingModal());
+                this.saveNameBtn.addEventListener('click', () => this.handleSaveName());
+
+                // Close modals on clicking outside content
+                [this.modalRules, this.modalRanking, this.modalNameEntry].forEach(m => {
+                    m.addEventListener('click', (e) => { if (e.target === m) m.style.display = 'none'; });
+                });
+            }
+
+            showRankingModal() {
+                const pCount = parseInt(document.getElementById('setting-players').value);
+                const level = parseInt(document.getElementById('setting-level').value);
+                const list = this.rankingManager.getRanking(pCount, level);
+
+                let levelText = level === 1 ? '易' : level === 2 ? '普' : '難';
+                this.rankingTitle.textContent = `ランキング (NPC:${pCount}人/Lv:${levelText})`;
+
+                if (list.length === 0) {
+                    this.rankingDisplayArea.innerHTML = '<p style="text-align:center; padding:20px;">データがありません</p>';
+                } else {
+                    let html = '<table class="ranking-table"><tr><th>順位</th><th>名前</th><th>スコア</th><th>日付</th></tr>';
+                    list.forEach((item, i) => {
+                        html += `<tr><td>${i + 1}</td><td>${item.name}</td><td>${item.score}</td><td>${item.date}</td></tr>`;
+                    });
+                    html += '</table>';
+                    this.rankingDisplayArea.innerHTML = html;
+                }
+                this.modalRanking.style.display = 'flex';
+            }
+
+            handleSaveName() {
+                const name = this.nameInput.value.trim().toUpperCase();
+                if (name.length !== 2 || !/^[A-Z]{2}$/i.test(name)) {
+                    alert('名前はアルファベット2文字で入力してください');
+                    return;
+                }
+                const player = this.engine.players[0];
+                const pCount = parseInt(document.getElementById('setting-players').value);
+                const level = parseInt(document.getElementById('setting-level').value);
+
+                this.rankingManager.saveScore(pCount, level, name, player.score);
+                this.modalNameEntry.style.display = 'none';
+                this.showRankingModal();
+            }
             appendLog(msg) { const div = document.createElement('div'); div.innerHTML = '> ' + msg; this.logArea.appendChild(div); this.logArea.scrollTop = this.logArea.scrollHeight; }
             updateInfo() {
                 this.deckCount.textContent = '山札: ' + this.engine.deck.length + '枚';
@@ -1016,6 +1387,15 @@
                     this.showFinalResult();
                     this.startBtn.textContent = "最初から遊ぶ";
                     this.currentRound = 6;
+
+                    // Rank-in logic
+                    const sorted = [...this.engine.players].sort((a, b) => b.score - a.score);
+                    if (sorted[0].id === 'player') {
+                        setTimeout(() => {
+                            this.modalNameEntry.style.display = 'flex';
+                            this.nameInput.focus();
+                        }, 1000);
+                    }
                 }
             }
             showFinalResult() {
